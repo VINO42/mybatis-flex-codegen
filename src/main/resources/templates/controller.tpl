@@ -9,11 +9,7 @@ import io.github.vino42.common.ServiceResponseResult;
 import io.github.vino42.common.ResultMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 jakarta.validation.Valid;
-
-import static io.github.vino42.common.ServiceResponseCodeEnum.ILLEGAL_ARGS;
-
 import #(packageConfig.entityPackage).#(entityClassName);
 import #(packageConfig.servicePackage).#(table.buildServiceClassName());
 #if(controllerConfig.restStyle)
