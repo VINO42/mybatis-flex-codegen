@@ -10,7 +10,7 @@ import io.github.vino42.common.ResultMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+jakarta.validation.Valid;
 
 import static io.github.vino42.common.ServiceResponseCodeEnum.ILLEGAL_ARGS;
 
