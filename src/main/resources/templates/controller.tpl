@@ -9,8 +9,11 @@ import io.github.vino42.common.ServiceResponseResult;
 import io.github.vino42.common.ResultMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
+
 import static io.github.vino42.common.ServiceResponseCodeEnum.ILLEGAL_ARGS;
+
 import #(packageConfig.entityPackage).#(entityClassName);
 import #(packageConfig.servicePackage).#(table.buildServiceClassName());
 #if(controllerConfig.restStyle)
@@ -31,6 +34,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 #end
+
 import java.io.Serializable;
 import java.util.List;
 
