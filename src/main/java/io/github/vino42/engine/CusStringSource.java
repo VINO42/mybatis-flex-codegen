@@ -73,7 +73,6 @@ public class CusStringSource implements ISource {
                 ret.append(buf, 0, num);
             }
             //这里的打印是给插件用
-            System.out.println(ret.toString());
             System.out.println("生成成功！");
             return ret;
         } catch (Exception e) {
