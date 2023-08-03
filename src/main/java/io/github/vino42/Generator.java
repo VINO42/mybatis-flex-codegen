@@ -40,7 +40,7 @@ public class Generator {
     protected GlobalConfig globalConfig;
     protected IDialect dialect = IDialect.DEFAULT;
 
-    protected Connection conn = null;
+    //    protected Connection conn = null;
     protected DatabaseMetaData dbMeta = null;
 
     public Generator(DataSource dataSource, GlobalConfig globalConfig) {
@@ -55,8 +55,7 @@ public class Generator {
     }
 
     public void generate() {
-        try {
-            conn = dataSource.getConnection();
+        try (Connection conn = dataSource.getConnection()) {
             dbMeta = conn.getMetaData();
 
             List<TableInfo> tables = buildTables();
@@ -75,51 +74,58 @@ public class Generator {
     }
 
     protected void buildPrimaryKey(TableInfo table) throws SQLException {
-        try (ResultSet rs = dbMeta.getPrimaryKeys(conn.getCatalog(), null, table.getName())) {
-            while (rs.next()) {
-                String primaryKey = rs.getString("COLUMN_NAME");
-                table.addPrimaryKey(primaryKey);
+        try (Connection conn = dataSource.getConnection()) {
+            try (ResultSet rs = dbMeta.getPrimaryKeys(conn.getCatalog(), null, table.getName())) {
+                while (rs.next()) {
+                    String primaryKey = rs.getString("COLUMN_NAME");
+                    table.addPrimaryKey(primaryKey);
+                }
             }
         }
     }
 
     private List<TableInfo> buildTables() throws SQLException {
-        StrategyConfig strategyConfig = globalConfig.getStrategyConfig();
-        String schemaName = strategyConfig.getGenerateSchema();
-        List<TableInfo> tables = new ArrayList<>();
-        try (ResultSet rs = getTablesResultSet(schemaName)) {
-            while (rs.next()) {
-                String tableName = rs.getString("TABLE_NAME");
-                if (!strategyConfig.isSupportGenerate(tableName)) {
-                    continue;
+        try (Connection conn = dataSource.getConnection()) {
+            StrategyConfig strategyConfig = globalConfig.getStrategyConfig();
+            String schemaName = strategyConfig.getGenerateSchema();
+            List<TableInfo> tables = new ArrayList<>();
+            try (ResultSet rs = getTablesResultSet(schemaName)) {
+                while (rs.next()) {
+                    String tableName = rs.getString("TABLE_NAME");
+                    if (!strategyConfig.isSupportGenerate(tableName)) {
+                        continue;
+                    }
+
+                    TableInfo table = new TableInfo();
+                    table.setGlobalConfig(globalConfig);
+                    table.setTableConfig(strategyConfig.getTableConfig(tableName));
+
+                    table.setSchema(schemaName);
+                    table.setName(tableName);
+
+                    String remarks = rs.getString("REMARKS");
+                    table.setComment(remarks);
+
+
+                    buildPrimaryKey(table);
+
+                    dialect.buildTableColumns(schemaName, table, globalConfig, dbMeta, conn);
+
+                    tables.add(table);
                 }
-
-                TableInfo table = new TableInfo();
-                table.setGlobalConfig(globalConfig);
-                table.setTableConfig(strategyConfig.getTableConfig(tableName));
-
-                table.setSchema(schemaName);
-                table.setName(tableName);
-
-                String remarks = rs.getString("REMARKS");
-                table.setComment(remarks);
-
-
-                buildPrimaryKey(table);
-
-                dialect.buildTableColumns(schemaName, table, globalConfig, dbMeta, conn);
-
-                tables.add(table);
             }
+            return tables;
         }
-        return tables;
+
     }
 
     protected ResultSet getTablesResultSet(String schema) throws SQLException {
-        if (globalConfig.getStrategyConfig().isGenerateForView()) {
-            return dialect.getTablesResultSet(dbMeta, conn, schema, new String[]{"TABLE", "VIEW"});
-        } else {
-            return dialect.getTablesResultSet(dbMeta, conn, schema, new String[]{"TABLE"});
+        try (Connection conn = dataSource.getConnection()) {
+            if (globalConfig.getStrategyConfig().isGenerateForView()) {
+                return dialect.getTablesResultSet(dbMeta, conn, schema, new String[]{"TABLE", "VIEW"});
+            } else {
+                return dialect.getTablesResultSet(dbMeta, conn, schema, new String[]{"TABLE"});
+            }
         }
     }
 
