@@ -22,6 +22,9 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.mybatisflex.core.util.StringUtil.underlineToCamel;
+import static io.github.vino42.constants.GenConstant.EMPTY;
+
 /**
  * 数据库表信息。
  */
@@ -42,7 +45,7 @@ public class TableInfo {
      */
     private String comment;
 
-    private boolean convert=true;
+    private boolean convert = true;
     /**
      * 主键。
      */
@@ -363,6 +366,17 @@ public class TableInfo {
                 + entityJavaFileName
                 + serviceConfig.getClassSuffix();
     }
+
+    /**
+     * 构建 cotroller 的 ReqName 名称。
+     */
+    public String buildCotrollerReqName() {
+        String tableName = this.name;
+        String tablePrefix = globalConfig.getTablePrefix();
+        tableName = tableName.replaceFirst(tablePrefix, EMPTY);
+        return underlineToCamel(tableName);
+    }
+
 
     /**
      * 构建 serviceImpl 的 Class 名称。

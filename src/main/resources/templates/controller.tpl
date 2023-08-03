@@ -1,6 +1,7 @@
 #set(tableComment = table.getComment())
 #set(entityClassName = table.buildEntityClassName())
 #set(entityVarName = firstCharToLowerCase(entityClassName))
+#set(requestPath = table.buildCotrollerReqName())
 #set(serviceVarName = firstCharToLowerCase(table.buildServiceClassName()))
 package #(packageConfig.controllerPackage);
 
@@ -56,7 +57,7 @@ import java.util.List;
 #if(withSwagger && swaggerVersion.getName() == "DOC")
 @Tag(name = "#(tableComment)接口")
 #end
-@RequestMapping("/#(firstCharToLowerCase(entityClassName))")
+@RequestMapping("/#(requestPath)")
 public class #(table.buildControllerClassName()) #if(controllerConfig.superClass)extends #(controllerConfig.buildSuperClassName()) #end {
 
     @Autowired
