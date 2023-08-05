@@ -100,11 +100,7 @@ public class TableInfo {
 
     public String getPrimaryKey() {
         // 这里默认表中一定会有字段，就不做空判断了
-        return columns.stream()
-                .filter(Column::isPrimaryKey)
-                .findFirst()
-                .map(Column::getProperty)
-                .orElse(null);
+        return columns.stream().filter(Column::isPrimaryKey).findFirst().map(Column::getProperty).orElse(null);
     }
 
     public Set<String> getPrimaryKeys() {
@@ -129,8 +125,7 @@ public class TableInfo {
     public List<Column> getSortedColumns() {
         ArrayList<Column> arrayList = new ArrayList<>(columns);
         // 生成字段排序
-        arrayList.sort(Comparator.comparingInt((Column c) -> c.getProperty().length())
-                .thenComparing(Column::getProperty));
+        arrayList.sort(Comparator.comparingInt((Column c) -> c.getProperty().length()).thenComparing(Column::getProperty));
         return arrayList;
     }
 
@@ -151,11 +146,13 @@ public class TableInfo {
         if (column.getAutoIncrement() == null) {
             column.setAutoIncrement(false);
         }
+        ColumnConfig columnConfig = globalConfig.getStrategyConfig().getColumnConfig(name, column.getName());
         KeyType keyType = (KeyType) globalConfig.getCustomConfig("keyType");
         if (keyType!=null){
-            globalConfig.getStrategyConfig().getColumnConfig(name, column.getName()).setKeyType(keyType);
+            columnConfig.setKeyType(keyType);
         }
-        column.setColumnConfig(globalConfig.getStrategyConfig().getColumnConfig(name, column.getName()));
+
+        column.setColumnConfig(columnConfig);
 
         columns.add(column);
     }
@@ -287,8 +284,7 @@ public class TableInfo {
     public String buildImplements() {
         Class<?>[] entityInterfaces = globalConfig.getEntityConfig().getImplInterfaces();
         if (entityInterfaces != null && entityInterfaces.length > 0) {
-            return " implements " + StringUtil.join(", ", Arrays.stream(entityInterfaces)
-                    .map(Class::getSimpleName).collect(Collectors.toList()));
+            return " implements " + StringUtil.join(", ", Arrays.stream(entityInterfaces).map(Class::getSimpleName).collect(Collectors.toList()));
         } else {
             return "";
         }
@@ -333,9 +329,7 @@ public class TableInfo {
     public String buildEntityClassName() {
         String entityJavaFileName = getEntityJavaFileName();
         EntityConfig entityConfig = globalConfig.getEntityConfig();
-        return entityConfig.getClassPrefix()
-                + entityJavaFileName
-                + entityConfig.getClassSuffix();
+        return entityConfig.getClassPrefix() + entityJavaFileName + entityConfig.getClassSuffix();
     }
 
     /**
@@ -344,9 +338,7 @@ public class TableInfo {
     public String buildTableDefClassName() {
         String tableDefJavaFileName = getEntityJavaFileName();
         TableDefConfig tableDefConfig = globalConfig.getTableDefConfig();
-        return tableDefConfig.getClassPrefix()
-                + tableDefJavaFileName
-                + tableDefConfig.getClassSuffix();
+        return tableDefConfig.getClassPrefix() + tableDefJavaFileName + tableDefConfig.getClassSuffix();
     }
 
     /**
@@ -355,9 +347,7 @@ public class TableInfo {
     public String buildMapperClassName() {
         String entityJavaFileName = getEntityJavaFileName();
         MapperConfig mapperConfig = globalConfig.getMapperConfig();
-        return mapperConfig.getClassPrefix()
-                + entityJavaFileName
-                + mapperConfig.getClassSuffix();
+        return mapperConfig.getClassPrefix() + entityJavaFileName + mapperConfig.getClassSuffix();
     }
 
     /**
@@ -366,9 +356,7 @@ public class TableInfo {
     public String buildServiceClassName() {
         String entityJavaFileName = getEntityJavaFileName();
         ServiceConfig serviceConfig = globalConfig.getServiceConfig();
-        return serviceConfig.getClassPrefix()
-                + entityJavaFileName
-                + serviceConfig.getClassSuffix();
+        return serviceConfig.getClassPrefix() + entityJavaFileName + serviceConfig.getClassSuffix();
     }
 
     /**
@@ -388,9 +376,7 @@ public class TableInfo {
     public String buildServiceImplClassName() {
         String entityJavaFileName = getEntityJavaFileName();
         ServiceImplConfig serviceImplConfig = globalConfig.getServiceImplConfig();
-        return serviceImplConfig.getClassPrefix()
-                + entityJavaFileName
-                + serviceImplConfig.getClassSuffix();
+        return serviceImplConfig.getClassPrefix() + entityJavaFileName + serviceImplConfig.getClassSuffix();
     }
 
     /**
@@ -399,9 +385,7 @@ public class TableInfo {
     public String buildControllerClassName() {
         String entityJavaFileName = getEntityJavaFileName();
         ControllerConfig controllerConfig = globalConfig.getControllerConfig();
-        return controllerConfig.getClassPrefix()
-                + entityJavaFileName
-                + controllerConfig.getClassSuffix();
+        return controllerConfig.getClassPrefix() + entityJavaFileName + controllerConfig.getClassSuffix();
     }
 
     /**
@@ -410,20 +394,12 @@ public class TableInfo {
     public String buildMapperXmlFileName() {
         String tableDefJavaFileName = getEntityJavaFileName();
         MapperXmlConfig mapperXmlConfig = globalConfig.getMapperXmlConfig();
-        return mapperXmlConfig.getFilePrefix()
-                + tableDefJavaFileName
-                + mapperXmlConfig.getFileSuffix();
+        return mapperXmlConfig.getFilePrefix() + tableDefJavaFileName + mapperXmlConfig.getFileSuffix();
     }
 
     @Override
     public String toString() {
-        return "Table{" +
-                "schema'" + schema + '\'' +
-                "name='" + name + '\'' +
-                ", remarks='" + comment + '\'' +
-                ", primaryKeys='" + primaryKeys + '\'' +
-                ", columns=" + columns +
-                '}';
+        return "Table{" + "schema'" + schema + '\'' + "name='" + name + '\'' + ", remarks='" + comment + '\'' + ", primaryKeys='" + primaryKeys + '\'' + ", columns=" + columns + '}';
     }
 
     public Set<String> getImportPackages() {
