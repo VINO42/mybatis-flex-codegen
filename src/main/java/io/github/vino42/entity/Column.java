@@ -53,7 +53,6 @@ public class Column {
      * 是否可为空。
      */
     private Integer nullable;
-
     /**
      * 是否为主键。
      */

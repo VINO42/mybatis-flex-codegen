@@ -15,6 +15,7 @@
  */
 package io.github.vino42.entity;
 
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.core.util.StringUtil;
 import io.github.vino42.config.*;
 
@@ -150,7 +151,10 @@ public class TableInfo {
         if (column.getAutoIncrement() == null) {
             column.setAutoIncrement(false);
         }
-
+        KeyType keyType = (KeyType) globalConfig.getCustomConfig("keyType");
+        if (keyType!=null){
+            globalConfig.getStrategyConfig().getColumnConfig(name, column.getName()).setKeyType(keyType);
+        }
         column.setColumnConfig(globalConfig.getStrategyConfig().getColumnConfig(name, column.getName()));
 
         columns.add(column);
